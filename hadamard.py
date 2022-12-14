@@ -55,10 +55,15 @@ if __name__ == "__main__":
     a = hadamard(3)
     pprint(pd.DataFrame(a))
     #check_dot_products(a)
+    print("Sending codeword at row 1 with no errors")
     message_vector = np.array([1,0,1,0,1,0,1,0]) # perfect vector
     print(decode_message_vector(message_vector, a))
+    print("sending codeword at row 6 with no errors")
+    message_vector = np.array([1,1,0,0,0,0,1,1])
+    print(decode_message_vector(message_vector, a))
+    print("Sending codeword at row 1 with 1 error")
     message_vector = np.array([1,1,1,0,1,0,1,0]) # one error
     print(decode_message_vector(message_vector, a))
+    print("Sending codeword at row 1 with 2 errors")
     message_vector = np.array([0,1,1,0,1,0,1,0]) # two error
     print(decode_message_vector(message_vector, a))
-    # print(encode_message_vector(np.array([0,0,1,1]), a))
