@@ -1,6 +1,11 @@
+from pprint import pprint
 import numpy as np
+import pandas as pd
 
-def hadamard(n, mem):
+def hadamard(n):
+    return hadamard_rec(n, {})
+
+def hadamard_rec(n, mem):
     # Sylvester construction for Hadamard matrices
     if n in mem:
         return mem[n]
@@ -8,7 +13,7 @@ def hadamard(n, mem):
         mem[n] = np.array([[1]])
         return mem[n]
     else:
-        mem[n] = np.kron(np.array([[1, 1], [1,-1]]), hadamard(n-1,mem))
+        mem[n] = np.kron(np.array([[1, 1], [1,-1]]), hadamard_rec(n-1,mem))
         return mem[n]
 
 def check_dot_products(m):
@@ -26,11 +31,34 @@ def encode_message_vector(x, hm):
     # print(f"Your encoded vector is {res}")
     return np.array(res)
 
+def decode_message_vector(x, hm):
+    # given a vector x and corresponding codewords matrix C=[H;-H],
+    # find which codeword the received vector is nearest to decode it
+    c = np.vstack((hm, np.negative(hm))) # stack -H and H
+    x[x==0] = -1
+    # c[c == -1] = 0 # replace all -1s with 0s 
+    n = c.shape[1] # n is the horiz dimension of this array's shape
+    for i, row in enumerate(c):
+        # if the dot product of two vectors > n/2, then that is
+        # the intended vector
+        if np.dot(x, row) > (n/2):
+            return i
+        if np.dot(x, row) == (n/2):
+            print("Error detected but can't be corrected")
+            return -1
+    return -1
+
 if __name__ == "__main__":
     mem = {}
-    print(hadamard(1, mem))
-    print(hadamard(2, mem))
-    a = hadamard(7, mem)
-    print(a)
-    # check_dot_products(a)
-    # encode_message_vector(np.array([0,0,1,1]), a)
+    pprint(hadamard(1))
+    pprint(hadamard(2))
+    a = hadamard(3)
+    pprint(pd.DataFrame(a))
+    #check_dot_products(a)
+    message_vector = np.array([1,0,1,0,1,0,1,0]) # perfect vector
+    print(decode_message_vector(message_vector, a))
+    message_vector = np.array([1,1,1,0,1,0,1,0]) # one error
+    print(decode_message_vector(message_vector, a))
+    message_vector = np.array([0,1,1,0,1,0,1,0]) # two error
+    print(decode_message_vector(message_vector, a))
+    # print(encode_message_vector(np.array([0,0,1,1]), a))
